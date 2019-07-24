@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
 import 'signup.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+
+
+
+
 
 class Login extends StatefulWidget {
   @override
@@ -7,11 +16,44 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  String message = "x";
+
   TextStyle style = TextStyle(
     fontFamily: 'Cairo',
     fontSize: 14.0,
     color: Colors.black,
   );
+
+  setlogin() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('counter', 1);
+  }
+
+  createPost(String url, Map jsonMap) async {
+    return http
+        .post(url, body: utf8.encode(json.encode(jsonMap)))
+        .then((http.Response response) {
+      if (response.statusCode == 201) {
+        print("DONE!");
+        setState(() {
+          message ="login";
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MyHomePage(title: "الاخبار",)),
+          );
+        });
+      } else {
+        setState(() {
+          message ="error";
+        });
+
+        print("ERROR!");
+      }
+      print(response.body);
+    });
+  }
+
+  static final CREATE_POST_URL = 'http://192.168.0.101:8080/news/api/login.php';
   final emailController = TextEditingController();
   final passController = TextEditingController();
 
@@ -49,8 +91,17 @@ class _LoginState extends State<Login> {
           child: MaterialButton(
             minWidth: 150.0,
             padding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
-            onPressed: () {
-              print("Second text field: ${passController.text}");
+            onPressed: () async {
+              Map map = {
+                'data': {
+                  'email': emailController.text,
+                  'password': passController.text,
+                }
+              };
+              createPost(CREATE_POST_URL, map);
+              setlogin();
+
+
             },
             child: Text("تسجيل الدخول",
                 textAlign: TextAlign.center,
@@ -93,6 +144,16 @@ class _LoginState extends State<Login> {
                   context,
                   MaterialPageRoute(builder: (context) => Signup()),
                 ),
+              ),
+              message == "error"
+                  ? new Text(
+                "خطأ في المعلومات",
+                style: TextStyle(fontSize: 16.0, color: Colors.black45),
+              )
+                  :
+                   new Text(
+                "",
+                style: TextStyle(fontSize: 16.0, color: Colors.black45),
               )
             ],
           ),

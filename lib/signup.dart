@@ -1,64 +1,54 @@
-import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-class data {
 
-  final String name;
-  final String email;
-  final String pass;
-  final String admin;
 
-  data({this.name, this.email, this.pass,this.admin});
 
-  factory data.fromJson(Map<String, dynamic> json) {
-    return data(
-      name: json['fullname'],
-      email: json['email'],
-      pass: json['password'],
-      admin: json['is_admin'],
 
-    );
-  }
-
-  Map toMap() {
-    var map = new Map<String, dynamic>();
-    map["fullname"] = name;
-    map["email"] = email;
-    map["password"] = pass;
-    map["is_admin"] = admin;
-    return map;
-  }
-}
-
-Future<data> createPost(String url, {Map body}) async {
-  return http.post(url, body: body).then((http.Response response) {
-    final int statusCode = response.statusCode;
-    print(response.body);
-    return data.fromJson(json.decode(response.body));
-
-  });
-}
 
 class Signup extends StatefulWidget {
-  final Future<data> post;
-  Signup({Key key, this.post}) : super(key: key);
+  Signup({Key key}) : super(key: key);
   @override
   _SignupState createState() => _SignupState();
 }
 
 class _SignupState extends State<Signup> {
 
+  String message = "x";
 
   TextStyle style = TextStyle(
     fontFamily: 'Cairo',
     fontSize: 14.0,
     color: Colors.black,
   );
-  static final CREATE_POST_URL = 'http://192.168.0.115:8080/api/register.php';
+  createPost(String url, Map jsonMap) async {
+    return http
+        .post(url, body: utf8.encode(json.encode(jsonMap)))
+        .then((http.Response response) {
+      if (response.statusCode == 201) {
+        print("DONE!");
+        setState(() {
+          message ="signup";
+          emailController.text ="";
+          nameController.text ="";
+          passController.text ="";
+        });
+      } else {
+        print("ERROR!");
+        setState(() {
+          message ="error";
+        });
+      }
+      print(response.body);
+    });
+  }
+
+  static final CREATE_POST_URL =
+      'http://192.168.0.101:8080/news/api/register.php';
   final emailController = TextEditingController();
   final passController = TextEditingController();
   final nameController = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
@@ -107,11 +97,15 @@ class _SignupState extends State<Signup> {
             minWidth: 150.0,
             padding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
             onPressed: () async {
-              data newPost = new data(
-                  name: nameController.text, email: emailController.text, pass: passController.text,admin: "0");
-              data p = await createPost(CREATE_POST_URL,
-                  body: {data  : newPost.toMap()});
-              print(p.email);
+              Map map = {
+                'data': {
+                  'fullname': nameController.text,
+                  'email': emailController.text,
+                  'password': passController.text,
+                  'is_admin': '0'
+                }
+              };
+              createPost(CREATE_POST_URL, map);
             },
             child: Text("انشاء حساب",
                 textAlign: TextAlign.center,
@@ -154,6 +148,20 @@ class _SignupState extends State<Signup> {
                 onTap: () => Navigator.pop(
                   context,
                 ),
+              ),
+              message == "signup"
+              ? new Text(
+                "تم التسجيل بنجاح",
+                style: TextStyle(fontSize: 16.0, color: Colors.black45),
+              )
+                  :  message == "error"
+        ? new Text(
+                " خطأ في المعلومات",
+                style: TextStyle(fontSize: 16.0, color: Colors.black45),
+              )
+                  :new Text(
+                "",
+                style: TextStyle(fontSize: 16.0, color: Colors.black45),
               )
             ],
           ),
