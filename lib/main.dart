@@ -1,23 +1,20 @@
 import 'package:flutter/material.dart';
-import 'new.dart';
 import 'login.dart';
 import 'Notifications.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 void main() => runApp(new MyApp());
 
-
-
 class MyApp extends StatelessWidget {
-
-
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      title: 'Flutter Demo',
+      title: 'news',
       debugShowCheckedModeBanner: false,
       theme: new ThemeData(
-      primarySwatch: Colors.blue,
-    ),
+        fontFamily: 'Cairo',
+      ),
       home: new MyHomePage(title: 'الأخبار'),
     );
   }
@@ -33,120 +30,131 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  List list = List();
+  var isLoading = false;
+  var len;
 
+  _fetchData() async {
+    setState(() {
+      isLoading = true;
+    });
+    final response =
+    await http.get('http://192.168.0.115:8080/api/articles/get.php');
+     list = json.decode(response.body) as List;
+      len = list.length;
+      setState(() {
+        isLoading = false;
+        print(len);
+      });
 
-
-  int getColorHexFromStr(String colorStr) {
-    colorStr = "FF" + colorStr;
-    colorStr = colorStr.replaceAll("#", "");
-    int val = 0;
-    int len = colorStr.length;
-    for (int i = 0; i < len; i++) {
-      int hexDigit = colorStr.codeUnitAt(i);
-      if (hexDigit >= 48 && hexDigit <= 57) {
-        val += (hexDigit - 48) * (1 << (4 * (len - 1 - i)));
-      } else if (hexDigit >= 65 && hexDigit <= 70) {
-        // A..F
-        val += (hexDigit - 55) * (1 << (4 * (len - 1 - i)));
-      } else if (hexDigit >= 97 && hexDigit <= 102) {
-        // a..f
-        val += (hexDigit - 87) * (1 << (4 * (len - 1 - i)));
-      } else {
-        throw new FormatException("An error occurred when converting a color");
-      }
-    }
-    return val;
   }
 
-
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setState(() {
+      _fetchData();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
         backgroundColor: Colors.white,
         appBar: new AppBar(
-          backgroundColor: Colors.blue[300],
-
-          leading:  IconButton(
-
-            icon: Icon(Icons.account_circle,textDirection: TextDirection.rtl,),
-            onPressed: () {Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => Login()),
-            );
-            },
-          ),
-
-          actions: <Widget>[
-
-              // action button
-
-            IconButton(
-
-              icon: Icon(Icons.notifications,textDirection: TextDirection.rtl,),
-              onPressed: () {Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => Notify()),
+            backgroundColor: Colors.blueGrey,
+            leading: IconButton(
+              icon: Icon(
+                Icons.account_circle,
+                textDirection: TextDirection.rtl,
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Login()),
                 );
               },
             ),
-          ],
+            actions: <Widget>[
+              // action button
+              IconButton(
+                icon: Icon(
+                  Icons.notifications,
+                  textDirection: TextDirection.rtl,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Notify()),
+                  );
+                },
+              ),
+            ],
             centerTitle: true,
+            title: new Center(
+              child: new Text(
+                widget.title,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22.0,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            )),
 
-          title: new Center(child:  new Text(
-            widget.title,
-            style: TextStyle(color: Colors.white, fontSize: 27.0,), textAlign: TextAlign.center,
-          ),)
-        ),
-
-
-        body:new Directionality(textDirection: TextDirection.rtl, child:  Container(
-          child: ListView.builder(
-            scrollDirection: Axis.vertical,
-            shrinkWrap: true,
-            itemCount: 10,
-            itemBuilder: (BuildContext context, int index) {
-              return makeCard;
-            },
-          ),
+        body: isLoading
+            ? Center(
+          child: CircularProgressIndicator(backgroundColor:Colors.blueGrey),
         )
-        )
-    );
+            : new Directionality(
+            textDirection: TextDirection.rtl,
+            child: Container(
+              child: ListView.builder(
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                itemCount: len,
+                itemBuilder: (BuildContext context, int index) {
+                  return Card(
+                      elevation: 8.0,
+                      margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 0.0),
+                        child: Container(
+                          decoration: BoxDecoration(color: Colors.white),
+                          child:  ListTile(
+                              contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+                              leading: Container(
+                                child: new Image(
+                                  image: AssetImage('assets/1.jpg'),
+                                  fit: BoxFit.fitHeight,
+                                  height: 120.0,
+                                  width: 100.0,
+                                ),
+                              ),
+                              title:new Text(list[index]['title'],
+                                style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold,fontSize:21.0),
+                              ),
+                              // subtitle: Text("Intermediate", style: TextStyle(color: Colors.white)),
+                              subtitle: new Column(
+                                children: <Widget>[
+                                  Text(list[index]['content'], style: TextStyle(color: Colors.black,fontSize:15.0 )),
+                                  new Row(children: <Widget>[
+                                    Icon(Icons.date_range, color: Colors.blueGrey,size: 15.0,),
+                                    Text(list[index]['date'], style: TextStyle(color: Colors.black,fontSize: 13.0)),
+                                  ],)
+
+                                ],
+                              ),
+                              trailing:
+                              Icon(Icons.keyboard_arrow_right, color: Colors.blueGrey, size: 30.0))
+                        )
+                      ));
+                },
+              ),
+            )));
   }
-  final makeCard = Card(
-    elevation: 8.0,
 
-    margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-    child: Padding(padding: EdgeInsets.only(top: 0.0),child: Container(
-      decoration: BoxDecoration(color: Colors.white),
-      child: makeListTile,
-    ),)
-  );
 
-  static final  makeListTile = ListTile(
-      contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
-      leading: Container(
 
-        child:  new Image(image: AssetImage('assets/1.jpg'),height: 400.0,width: 110.0,),
-      ),
-      title: Text(
-        "نيمار يستقبل رسالة سلبية من برشلونة يواصل مسؤولو برشلونة، فرض حالة من الغموض حول مدى جديتهم في إعادة ",
-        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-      ),
-      // subtitle: Text("Intermediate", style: TextStyle(color: Colors.white)),
-
-      subtitle: Row(
-        children: <Widget>[
-          Icon(Icons.date_range, color: Colors.blue[300]),
-          Text(" 10/2/2019", style: TextStyle(color: Colors.black))
-        ],
-      ),
-      trailing:
-      Icon(Icons.keyboard_arrow_right, color: Colors.white, size: 30.0));
 }
-
-
-
-
-
-

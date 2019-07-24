@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class Notify extends StatefulWidget {
   @override
@@ -6,62 +8,103 @@ class Notify extends StatefulWidget {
 }
 
 class _NotifyState extends State<Notify> {
+  List list = List();
+  var isLoading = false;
+  var len;
+
+  _fetchData() async {
+    setState(() {
+      isLoading = true;
+
+    });
+    final response =
+    await http.get('http://192.168.0.115:8080/api/notify/get.php');
+    list = json.decode(response.body) as List;
+    len = list.length;
+
+    setState(() {
+
+      isLoading = false;
+      print(list[1]['title']);
+    });
+
+  }
+
+
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setState(() {
+      _fetchData();
+
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
         backgroundColor: Colors.white,
         appBar: new AppBar(
-            backgroundColor: Colors.blue[300],
-            centerTitle: true,
-            title: new Center(child:  new Text(
-              "الاشعارات",
-              style: TextStyle(color: Colors.white, fontSize: 27.0,), textAlign: TextAlign.center,
-            ),)
-        ),
-
-
-        body:new Directionality(textDirection: TextDirection.rtl, child:  Container(
-          child: ListView.builder(
-            scrollDirection: Axis.vertical,
-            shrinkWrap: true,
-            itemCount: 10,
-            itemBuilder: (BuildContext context, int index) {
-              return makeCard;
-            },
+          backgroundColor: Colors.blueGrey,
+          centerTitle: true,
+          title: new Text(
+            "الاشعارات",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 22.0,
+            ),
+            textAlign: TextAlign.center,
           ),
+        ),
+        body: isLoading
+            ? Center(
+          child: CircularProgressIndicator(backgroundColor:Colors.blueGrey),
         )
-        )
-    );
+            : new Directionality(
+            textDirection: TextDirection.rtl,
+            child: Container(
+              child: ListView.builder(
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                itemCount: len,
+                itemBuilder: (BuildContext context, int index) {
+                  return Card(
+                    elevation: 8.0,
+                    margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                    child: Container(
+                      decoration: BoxDecoration(color: Colors.white),
+                      child: ListTile(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+                        leading: Container(
+                          child: Icon(
+                            Icons.notifications_none,
+                            color: Colors.blueGrey,
+                            size: 30.0,
+                          ),
+                        ),
+                        title: new Text(list[index]['title'],
+                          style: TextStyle(
+                              fontSize: 16.0, color: Colors.black, fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: new Column(
+                          children: <Widget>[
+                            Text(list[index]['content'], style: TextStyle(color: Colors.black,fontSize:14.0 )),
+                            new Row(children: <Widget>[
+                              Icon(Icons.date_range, color: Colors.blueGrey,size: 12.0,),
+                              Text(list[index]['date'], style: TextStyle(color: Colors.black,fontSize: 12.0)),
+                            ],)
+
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            )));
   }
-  final makeCard = Card(
-      elevation: 8.0,
 
-      margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-      child: Padding(padding: EdgeInsets.only(top: 0.0),child: Container(
-        decoration: BoxDecoration(color: Colors.white),
-        child: makeListTile,
-      ),)
-  );
-
-  static final  makeListTile = ListTile(
-      contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
-      leading: Container(
-
-        child:   Icon(Icons.notifications, color: Colors.blue[300],size: 50.0,),
-      ),
-      title: Text(
-        "نيمار يستقبل رسالة سلبية من برشلونة",
-        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-      ),
-      // subtitle: Text("Intermediate", style: TextStyle(color: Colors.white)),
-
-      subtitle: Row(
-        children: <Widget>[
-          Icon(Icons.date_range, color: Colors.blue[300]),
-          Text(" 10/2/2019", style: TextStyle(color: Colors.black))
-        ],
-      ),
-      trailing:
-      Icon(Icons.keyboard_arrow_right, color: Colors.blue[300], size: 30.0));
 }
-

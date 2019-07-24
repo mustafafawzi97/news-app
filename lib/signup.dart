@@ -1,123 +1,164 @@
+import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'login.dart';
+import 'package:http/http.dart' as http;
+class data {
+
+  final String name;
+  final String email;
+  final String pass;
+  final String admin;
+
+  data({this.name, this.email, this.pass,this.admin});
+
+  factory data.fromJson(Map<String, dynamic> json) {
+    return data(
+      name: json['fullname'],
+      email: json['email'],
+      pass: json['password'],
+      admin: json['is_admin'],
+
+    );
+  }
+
+  Map toMap() {
+    var map = new Map<String, dynamic>();
+    map["fullname"] = name;
+    map["email"] = email;
+    map["password"] = pass;
+    map["is_admin"] = admin;
+    return map;
+  }
+}
+
+Future<data> createPost(String url, {Map body}) async {
+  return http.post(url, body: body).then((http.Response response) {
+    final int statusCode = response.statusCode;
+    print(response.body);
+    return data.fromJson(json.decode(response.body));
+
+  });
+}
 
 class Signup extends StatefulWidget {
+  final Future<data> post;
+  Signup({Key key, this.post}) : super(key: key);
   @override
   _SignupState createState() => _SignupState();
 }
 
 class _SignupState extends State<Signup> {
-  TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0,);
+
+
+  TextStyle style = TextStyle(
+    fontFamily: 'Cairo',
+    fontSize: 14.0,
+    color: Colors.black,
+  );
+  static final CREATE_POST_URL = 'http://192.168.0.115:8080/api/register.php';
   final emailController = TextEditingController();
   final passController = TextEditingController();
   final nameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-
-    final emailField = TextField(
-      obscureText: false,
-      style: style,
-      controller: emailController,
-      textAlign: TextAlign.right,
-      decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
-          hintText: "البريد الالكتروني",
-          border:
-          OutlineInputBorder(borderRadius: BorderRadius.circular(50.0))),
-    );
-    final passwordField = TextFormField(
-      obscureText: true,
-      style: style,
-      controller: passController,
-      textAlign: TextAlign.right,
-      decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
-          hintText: "كلمة المرور",
-          border:
-          OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
-    );
-    final nameField = TextField(
-      obscureText: false,
-      style: style,
-      controller: nameController,
-      textAlign: TextAlign.right,
-      decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
-          hintText: "اسم المستخدم",
-          border:
-          OutlineInputBorder(borderRadius: BorderRadius.circular(50.0))),
-    );
-    final loginButon = Material(
-      elevation: 5.0,
-      borderRadius: BorderRadius.circular(30.0),
-      color: Colors.blue[300],
-      child: MaterialButton(
-        minWidth: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
-        onPressed: () {},
-        child: Text("انشاء حساب",
-            textAlign: TextAlign.center,
-            style: style.copyWith(
-                color: Colors.white, fontWeight: FontWeight.bold)),
-      ),
-    );
+    final nameField = Padding(
+        padding: const EdgeInsets.only(top: 60.0, right: 15.0, left: 15.0),
+        child: TextField(
+          obscureText: false,
+          controller: nameController,
+          style: style,
+          textAlign: TextAlign.right,
+          decoration: InputDecoration(
+            contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
+            hintText: "اسم المستخدم",
+          ),
+        ));
+    final emailField = Padding(
+        padding: const EdgeInsets.only(right: 15.0, left: 15.0),
+        child: TextField(
+          obscureText: false,
+          controller: emailController,
+          style: style,
+          textAlign: TextAlign.right,
+          decoration: InputDecoration(
+            contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
+            hintText: "البريد الالكتروني",
+          ),
+        ));
+    final passwordField = Padding(
+        padding: const EdgeInsets.only(right: 15.0, left: 15.0),
+        child: TextFormField(
+          obscureText: true,
+          controller: passController,
+          style: style,
+          textAlign: TextAlign.right,
+          decoration: InputDecoration(
+            contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
+            hintText: "كلمة المرور",
+          ),
+        ));
+    final loginButon = Padding(
+        padding: const EdgeInsets.only(top: 20.0, right: 15.0, left: 15.0),
+        child: Material(
+          elevation: 5.0,
+          color: Colors.blueGrey,
+          child: MaterialButton(
+            minWidth: 150.0,
+            padding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
+            onPressed: () async {
+              data newPost = new data(
+                  name: nameController.text, email: emailController.text, pass: passController.text,admin: "0");
+              data p = await createPost(CREATE_POST_URL,
+                  body: {data  : newPost.toMap()});
+              print(p.email);
+            },
+            child: Text("انشاء حساب",
+                textAlign: TextAlign.center,
+                style: style.copyWith(color: Colors.white)),
+          ),
+        ));
 
     return Scaffold(
-        appBar: new AppBar(
-            backgroundColor: Colors.blue[300],
-            centerTitle: true,
-            title: new Center(child:  new Text(
-              "انشاء حساب",
-              style: TextStyle(color: Colors.white, fontSize: 24.0,), textAlign: TextAlign.left,
-            ),)
-        ),
-        body:new SingleChildScrollView(child: Center(
-          child: Container(
-            color: Colors.white,
-            child: Padding(
-              padding: const EdgeInsets.only(top:30.0 , right: 50.0,left: 50.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  SizedBox(
-                    height: 130.0,
-                    child: Image.asset(
-                      "assets/3.png",
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20.0,
-                  ),
-                  nameField,
-                  SizedBox(
-                    height: 20.0,
-                  ),
-                  emailField,
-                  SizedBox(height: 20.0),
-                  passwordField,
-                  SizedBox(
-                    height: 20.0,
-                  ),
-                  loginButon,
-                  SizedBox(
-                    height: 25.0,
-                  ),
-                  new InkWell(
-                    child: new Text(" لديك حساب ؟  تسجيل الدخول",style: TextStyle(fontSize: 20.0,color: Colors.black45),),
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Login()),
-                    )
-                    ,
-                  ),
-
-                ],
+        body: new SingleChildScrollView(
+      child: Center(
+        child: Container(
+          color: Colors.white,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              SizedBox(
+                child: Image.asset(
+                  "assets/login.png",
+                  fit: BoxFit.fitWidth,
+                ),
               ),
-            ),
+              nameField,
+              SizedBox(height: 10.0),
+              emailField,
+              SizedBox(height: 20.0),
+              passwordField,
+              SizedBox(
+                height: 20.0,
+              ),
+              loginButon,
+              SizedBox(
+                height: 25.0,
+              ),
+              new InkWell(
+                child: new Text(
+                  "تسجيل دخول؟",
+                  style: TextStyle(fontSize: 16.0, color: Colors.black45),
+                ),
+                onTap: () => Navigator.pop(
+                  context,
+                ),
+              )
+            ],
           ),
         ),
-        )
-    );
+      ),
+    ));
   }
 }
