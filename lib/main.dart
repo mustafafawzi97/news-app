@@ -36,13 +36,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
   List<Uint8List> image = List();
+  List content = List();
   List list = List();
   var isLoading = false;
     var len;
     Uint8List bytes;
-    String z;
-    String y;
+
 
   setlogout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -54,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
       isLoading = true;
     });
     final response =
-    await http.get('http://192.168.0.101:8080/news/api/articles/get.php');
+    await http.get('http://192.168.0.108:8080/news/api/articles/get.php');
      list = json.decode(response.body) as List;
       len = list.length;
 
@@ -65,7 +66,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   }
 
+
   getimage() {
+    String z;
+    String y;
     for(int i=0;i<len;i++){
       z=list[i]['image'];
       y = z.replaceAll("data:image/png;base64,","");
@@ -160,7 +164,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       height: 120.0,
                                       width: 100.0,),
                                   ),
-                                  title: new Text(list[index]['title'],
+                                  title: new Text(list[index]['title'].substring(0,10),
                                     style: TextStyle(color: Colors.black,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 21.0),
@@ -168,7 +172,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   // subtitle: Text("Intermediate", style: TextStyle(color: Colors.white)),
                                   subtitle: new Column(
                                     children: <Widget>[
-                                      Text(list[index]['content'],
+                                      Text((list[index]['content']).substring(0,51),
                                           style: TextStyle(color: Colors.black,
                                               fontSize: 15.0)),
                                       new Row(children: <Widget>[

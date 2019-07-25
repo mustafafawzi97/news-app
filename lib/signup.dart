@@ -44,7 +44,7 @@ class _SignupState extends State<Signup> {
   }
 
   static final CREATE_POST_URL =
-      'http://192.168.0.101:8080/news/api/register.php';
+      'http://192.168.0.108:8080/news/api/register.php';
   final emailController = TextEditingController();
   final passController = TextEditingController();
   final nameController = TextEditingController();
@@ -59,6 +59,7 @@ class _SignupState extends State<Signup> {
           controller: nameController,
           style: style,
           textAlign: TextAlign.right,
+          keyboardType: TextInputType.text,
           decoration: InputDecoration(
             contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
             hintText: "اسم المستخدم",
@@ -71,6 +72,7 @@ class _SignupState extends State<Signup> {
           controller: emailController,
           style: style,
           textAlign: TextAlign.right,
+          keyboardType: TextInputType.emailAddress,
           decoration: InputDecoration(
             contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
             hintText: "البريد الالكتروني",
@@ -82,6 +84,7 @@ class _SignupState extends State<Signup> {
           obscureText: true,
           controller: passController,
           style: style,
+          keyboardType: TextInputType.text,
           textAlign: TextAlign.right,
           decoration: InputDecoration(
             contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
@@ -113,7 +116,7 @@ class _SignupState extends State<Signup> {
           ),
         ));
 
-    return Scaffold(
+    return Scaffold(backgroundColor:Colors.white,
         body: new SingleChildScrollView(
       child: Center(
         child: Container(
@@ -125,11 +128,12 @@ class _SignupState extends State<Signup> {
               SizedBox(
                 child: Image.asset(
                   "assets/login.png",
-                  fit: BoxFit.fitWidth,
+                  fit: BoxFit.fill,
+                  width:600.0 ,
                 ),
               ),
               nameField,
-              SizedBox(height: 10.0),
+              SizedBox(height: 20.0),
               emailField,
               SizedBox(height: 20.0),
               passwordField,

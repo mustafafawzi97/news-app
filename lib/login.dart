@@ -53,7 +53,7 @@ class _LoginState extends State<Login> {
     });
   }
 
-  static final CREATE_POST_URL = 'http://192.168.0.101:8080/news/api/login.php';
+  static final CREATE_POST_URL = 'http://192.168.0.108:8080/news/api/login.php';
   final emailController = TextEditingController();
   final passController = TextEditingController();
 
@@ -66,6 +66,7 @@ class _LoginState extends State<Login> {
           controller: emailController,
           style: style,
           textAlign: TextAlign.right,
+          keyboardType: TextInputType.emailAddress,
           decoration: InputDecoration(
             contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
             hintText: "البريد الالكتروني",
@@ -78,6 +79,7 @@ class _LoginState extends State<Login> {
           controller: passController,
           style: style,
           textAlign: TextAlign.right,
+          keyboardType: TextInputType.text,
           decoration: InputDecoration(
             contentPadding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
             hintText: "كلمة المرور",
@@ -109,11 +111,10 @@ class _LoginState extends State<Login> {
           ),
         ));
 
-    return Scaffold(
+    return Scaffold(backgroundColor: Colors.white,
         body: new SingleChildScrollView(
-      child: Center(
-        child: Container(
-          color: Colors.white,
+      child: Container(
+
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -121,7 +122,9 @@ class _LoginState extends State<Login> {
               SizedBox(
                 child: Image.asset(
                   "assets/login.png",
-                  fit: BoxFit.fitWidth,
+                  fit: BoxFit.fill,
+                  width:600.0 ,
+
                 ),
               ),
               SizedBox(height: 10.0),
@@ -159,6 +162,6 @@ class _LoginState extends State<Login> {
           ),
         ),
       ),
-    ));
+    );
   }
 }
