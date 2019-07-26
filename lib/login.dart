@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:crypto/crypto.dart';
 
 
 
@@ -94,10 +95,12 @@ class _LoginState extends State<Login> {
             minWidth: 150.0,
             padding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
             onPressed: () async {
+              var bytes = utf8.encode(passController.text); // data being hashed
+              var digest = sha1.convert(bytes);
               Map map = {
                 'data': {
                   'email': emailController.text,
-                  'password': passController.text,
+                  'password': digest.toString(),
                 }
               };
               createPost(CREATE_POST_URL, map);

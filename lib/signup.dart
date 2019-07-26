@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:email_validator/email_validator.dart';
+import 'package:crypto/crypto.dart';
 
 
 class Signup extends StatefulWidget {
@@ -102,12 +103,18 @@ class _SignupState extends State<Signup> {
             minWidth: 150.0,
             padding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
             onPressed: () async {
+
               if (_formKey.currentState.validate()) {
+
+                var bytes = utf8.encode(passController.text); // data being hashed
+                var digest = sha1.convert(bytes);
+
+                print(digest.toString());
                 Map map = {
                   'data': {
                     'fullname': nameController.text,
                     'email': emailController.text,
-                    'password': passController.text,
+                    'password':digest.toString() ,
                     'is_admin': '0'
                   }
                 };
