@@ -53,7 +53,7 @@ class _LoginState extends State<Login> {
     });
   }
 
-  static final CREATE_POST_URL = 'http://192.168.0.108:8080/news/api/login.php';
+  static final CREATE_POST_URL = 'http://192.168.0.113:8080/news/api/login.php';
   final emailController = TextEditingController();
   final passController = TextEditingController();
 

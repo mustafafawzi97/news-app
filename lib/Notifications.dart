@@ -18,7 +18,7 @@ class _NotifyState extends State<Notify> {
 
     });
     final response =
-    await http.get('http://192.168.0.108:8080/news/api/notify/get.php');
+    await http.get('http://192.168.0.113:8080/news/api/notify/get.php');
     list = json.decode(response.body) as List;
     len = list.length;
 

@@ -34,7 +34,7 @@ class _SplashState extends State<Splash> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Timer(Duration(seconds: 3), () => getlogin());
+     Timer(Duration(seconds: 3), () => getlogin());
   }
 
   @override
@@ -59,7 +59,7 @@ class _SplashState extends State<Splash> {
                         backgroundColor: Colors.white,
                         radius: 50.0,
                         child: Icon(
-                          Icons.chat_bubble_outline,
+                          Icons.vpn_lock,
                           color: Colors.black,
                           size: 50.0,
                         ),
@@ -68,7 +68,7 @@ class _SplashState extends State<Splash> {
                         padding: EdgeInsets.only(top: 10.0),
                       ),
                       Text(
-                        "اخر الاخبار",
+                        "اخباري",
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
