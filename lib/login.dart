@@ -37,6 +37,7 @@ class _LoginState extends State<Login> {
       if (response.statusCode == 201) {
         print("DONE!");
         setState(() {
+          setlogin();
           message ="login";
           Navigator.push(
             context,
@@ -54,7 +55,7 @@ class _LoginState extends State<Login> {
     });
   }
 
-  static final CREATE_POST_URL = 'http://192.168.0.113:8080/news/api/login.php';
+  static final CREATE_POST_URL = 'http://192.168.1.18:8080/news/api/login.php';
   final emailController = TextEditingController();
   final passController = TextEditingController();
 
@@ -104,7 +105,6 @@ class _LoginState extends State<Login> {
                 }
               };
               createPost(CREATE_POST_URL, map);
-              setlogin();
 
 
             },

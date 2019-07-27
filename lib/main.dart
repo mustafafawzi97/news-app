@@ -56,7 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
       isLoading = true;
     });
     final response =
-    await http.get('http://192.168.0.113:8080/news/api/articles/get.php');
+    await http.get('http://192.168.1.18:8080/news/api/articles/get.php');
      list = json.decode(response.body) as List;
       len = list.length;
 
@@ -194,14 +194,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                       height: 120.0,
                                       width: 100.0,),
                                   ),
-                                  title: new Text(list[index]['title'].substring(0,15),
+                                  title: new Text(list[index]['title'],
                                     style: TextStyle(color: Colors.black,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 21.0),
                                   ),
                                   subtitle: new Column(
                                     children: <Widget>[
-                                      Text((list[index]['content']).substring(0,51),
+                                      Text((list[index]['content']).substring(0,25),
                                           style: TextStyle(color: Colors.black,
                                               fontSize: 15.0)),
                                       new Row(children: <Widget>[

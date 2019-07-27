@@ -43,7 +43,7 @@ class _SignupState extends State<Signup> {
   }
 
   static final CREATE_POST_URL =
-      'http://192.168.0.113:8080/news/api/register.php';
+      'http://192.168.1.18:8080/news/api/register.php';
   final emailController = TextEditingController();
   final passController = TextEditingController();
   final nameController = TextEditingController();
