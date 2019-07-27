@@ -7,6 +7,7 @@ import 'new.dart';
 import 'dart:typed_data';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'splash.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 void main() => runApp(new MyApp());
 
@@ -36,7 +37,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
+  final FirebaseMessaging _fcm = FirebaseMessaging();
   List<Uint8List> image = List();
   List content = List();
   List list = List();
@@ -78,13 +79,42 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-@override
+  @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     setState(() {
       _fetchData();
     });
+
+    _fcm.subscribeToTopic('news');
+    _fcm.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        print("onMessage: $message");
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            content: ListTile(
+              title: Text(message['notification']['title']),
+              subtitle: Text(message['notification']['body']),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Ok'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+        );
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print("onLaunch: $message");
+        // TODO optional
+      },
+      onResume: (Map<String, dynamic> message) async {
+        print("onResume: $message");
+        // TODO optional
+      },
+    );
   }
 
   @override
